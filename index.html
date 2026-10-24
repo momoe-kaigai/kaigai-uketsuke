@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>受付</title>
+<style>
+body{font-family:-apple-system,"Hiragino Sans",sans-serif;margin:0;padding:16px;background:#fafafa;color:#222}
+.box{border-radius:16px;padding:20px;margin:12px 0;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.ok{border-left:10px solid #2e9d5b}.ng{border-left:10px solid #d33}.al{border-left:10px solid #e8a400}
+.name{font-size:28px;font-weight:bold}.big{font-size:22px;margin-top:8px}
+.after{background:#ffe3ef;border-radius:12px;padding:16px;margin-top:14px;font-size:22px;font-weight:bold}
+.mode button{font-size:18px;padding:10px 14px;margin-right:8px;border-radius:10px;border:1px solid #999;background:#fff}
+.mode button.on{background:#222;color:#fff}
+input{font-size:20px;padding:10px;width:60%}.go{font-size:20px;padding:10px 16px}
+small{color:#666}
+</style>
+</head>
+<body>
+<!-- KAIGAI PARTY の当日受付：お客さんのQRコードをスタッフのスマホで読むと、このページが開く -->
+<div class="mode">入口：<button id="m_main">パーティー</button><button id="m_after">アフターパーティー</button></div>
+<div id="pw" class="box" style="display:none">スタッフの合言葉<br><input id="pass" type="password"><button class="go" id="save">OK</button></div>
+<div id="out" class="box">読み込み中…</div>
+<small>QRが読めないお客さんは、スプレッドシートの「受付」タブで名前を探してチェックしてください</small>
+<script>
+var q = new URLSearchParams(location.search);
+var token = (q.get("t") || "").replace(/[^0-9a-f]/g, "");
+var app = (q.get("g") || "").replace(/[^A-Za-z0-9_-]/g, "");
+function get(k){try{return localStorage.getItem(k)||""}catch(e){return ""}}
+function set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+var mode = get("kaigai_mode") || "main";
+function paint(){
+  document.getElementById("m_main").className = mode == "main" ? "on" : "";
+  document.getElementById("m_after").className = mode == "after" ? "on" : "";
+}
+document.getElementById("m_main").onclick = function(){ mode = "main"; set("kaigai_mode", mode); run(); };
+document.getElementById("m_after").onclick = function(){ mode = "after"; set("kaigai_mode", mode); run(); };
+document.getElementById("save").onclick = function(){
+  set("kaigai_pass", document.getElementById("pass").value);
+  document.getElementById("pw").style.display = "none";
+  run();
+};
+function esc(t){return String(t||"").replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function show(r){
+  var o = document.getElementById("out");
+  if (r.ng == "合言葉がちがいます") { document.getElementById("pw").style.display = "block"; o.className = "box ng"; o.innerHTML = "合言葉を入れてください"; return; }
+  var head = r.name ? '<div class="name">' + esc(r.name) + ' 様</div><div class="big">' + r.people + '名・' + esc(r.ticket) + '</div>' : "";
+  if (r.guests) head += '<div><small>お連れ様：' + esc(r.guests) + '</small></div>';
+  if (r.ng) { o.className = "box ng"; o.innerHTML = '<div class="big">✖ ' + esc(r.ng) + '</div>' + head; return; }
+  if (r.already) { o.className = "box al"; o.innerHTML = '<div class="big">⚠ もう入場済みです</div>' + head; return; }
+  var after = "";
+  if (mode == "main" && r.after) after = '<div class="after">🎟 アフターパーティーあり<br>アフターのチケットを ' + r.people + '枚 渡してください</div>';
+  if (mode == "main" && !r.after) after = '<div class="big"><small>アフターパーティーなし（当日券 3,000円 の案内OK）</small></div>';
+  o.className = "box ok"; o.innerHTML = '<div class="big">✔ 受付OK</div>' + head + after;
+}
+function run(){
+  paint();
+  var o = document.getElementById("out");
+  if (!token || !app) { o.innerHTML = "お客さんのQRコードを読んで開いてください"; return; }
+  var pass = get("kaigai_pass");
+  if (!pass) { document.getElementById("pw").style.display = "block"; o.innerHTML = "合言葉を入れてください"; return; }
+  o.className = "box"; o.innerHTML = "確認中…";
+  var url = "https://script.google.com/macros/s/" + app + "/exec?api=checkin&t=" + token +
+    "&m=" + mode + "&p=" + encodeURIComponent(pass);
+  // Googleのログイン情報を送らない（アカウントが2つ以上入っているスマホでも開けるように）
+  fetch(url, { credentials: "omit" })
+    .then(function(res){ return res.json(); })
+    .then(show)
+    .catch(function(e){ show({ ng: "通信エラー。もう一度読んでください（" + e.message + "）" }); });
+}
+run();
+</script>
+</body>
+</html>
