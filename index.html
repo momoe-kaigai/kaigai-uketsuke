@@ -15,14 +15,19 @@ body{font-family:-apple-system,"Hiragino Sans",sans-serif;margin:0;padding:16px;
 .mode button.on{background:#222;color:#fff}
 input{font-size:20px;padding:10px;width:60%}.go{font-size:20px;padding:10px 16px}
 small{color:#666}
+#cam{display:none;margin:12px 0}#cam video{width:100%;max-height:45vh;object-fit:cover;border-radius:16px;background:#000}
+.scan{font-size:22px;padding:14px;width:100%;border-radius:14px;border:0;background:#222;color:#fff;margin-top:8px}
 </style>
 </head>
 <body>
 <!-- KAIGAI PARTY の当日受付：お客さんのQRコードをスタッフのスマホで読むと、このページが開く -->
 <div class="mode">入口：<button id="m_main">パーティー</button><button id="m_after">アフターパーティー</button></div>
 <div id="pw" class="box" style="display:none">スタッフの合言葉<br><input id="pass" type="password"><button class="go" id="save">OK</button></div>
+<button class="scan" id="scan">📷 カメラで続けて読む</button>
+<div id="cam"><video id="v" playsinline muted></video><canvas id="c" style="display:none"></canvas><small id="camMsg">QRコードをかざしてください</small></div>
 <div id="out" class="box">読み込み中…</div>
 <small>QRが読めないお客さんは、スプレッドシートの「受付」タブで名前を探してチェックしてください</small>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <script>
 var q = new URLSearchParams(location.search);
 var token = (q.get("t") || "").replace(/[^0-9a-f]/g, "");
@@ -54,10 +59,11 @@ function show(r){
   if (mode == "main" && !r.after) after = '<div class="big"><small>アフターパーティーなし（当日券 3,000円 の案内OK）</small></div>';
   o.className = "box ok"; o.innerHTML = '<div class="big">✔ 受付OK</div>' + head + after;
 }
+if (app) set("kaigai_app", app); else app = get("kaigai_app");
 function run(){
   paint();
   var o = document.getElementById("out");
-  if (!token || !app) { o.innerHTML = "お客さんのQRコードを読んで開いてください"; return; }
+  if (!token || !app) { o.innerHTML = "「カメラで続けて読む」を押して、お客さんのQRコードをかざしてください"; return; }
   var pass = get("kaigai_pass");
   if (!pass) { document.getElementById("pw").style.display = "block"; o.innerHTML = "合言葉を入れてください"; return; }
   o.className = "box"; o.innerHTML = "確認中…";
@@ -66,8 +72,51 @@ function run(){
   // Googleのログイン情報を送らない（アカウントが2つ以上入っているスマホでも開けるように）
   fetch(url, { credentials: "omit" })
     .then(function(res){ return res.json(); })
-    .then(show)
-    .catch(function(e){ show({ ng: "通信エラー。もう一度読んでください（" + e.message + "）" }); });
+    .then(function(r){ show(r); beep(!r.ng && !r.already); })
+    .catch(function(e){ show({ ng: "通信エラー。もう一度読んでください（" + e.message + "）" }); beep(false); });
+}
+
+// ページを開いたまま、カメラで次々に読む（1人ごとにカメラアプリを開かなくていい）
+var lastToken = "", lastAt = 0, scanning = false;
+function beep(ok){
+  try { navigator.vibrate && navigator.vibrate(ok ? 120 : [80, 60, 80]); } catch(e){}
+  try {
+    var a = new (window.AudioContext || window.webkitAudioContext)(), o = a.createOscillator();
+    o.frequency.value = ok ? 1200 : 300; o.connect(a.destination); o.start(); o.stop(a.currentTime + (ok ? 0.12 : 0.3));
+  } catch(e){}
+}
+document.getElementById("scan").onclick = function(){
+  if (scanning) return;
+  if (!window.jsQR) { alert("読み込み中です。少し待ってからもう一度押してください"); return; }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false }).then(function(stream){
+    scanning = true;
+    document.getElementById("cam").style.display = "block";
+    document.getElementById("scan").style.display = "none";
+    var v = document.getElementById("v"); v.srcObject = stream; v.play();
+    var c = document.getElementById("c"), ctx = c.getContext("2d", { willReadFrequently: true });
+    (function tick(){
+      if (v.readyState >= 2) {
+        var w = 480, h = Math.round(v.videoHeight * w / v.videoWidth) || 360;
+        c.width = w; c.height = h; ctx.drawImage(v, 0, 0, w, h);
+        var code = jsQR(ctx.getImageData(0, 0, w, h).data, w, h, { inversionAttempts: "dontInvert" });
+        if (code && code.data) found(code.data);
+      }
+      setTimeout(tick, 150);
+    })();
+  }).catch(function(e){
+    alert("カメラが使えません。スマホの設定でこのページにカメラを許可してください（" + e.message + "）");
+  });
+};
+function found(text){
+  var m = String(text).match(/[?&]t=([0-9a-f]+)/);
+  if (!m) { document.getElementById("camMsg").innerHTML = "KAIGAI PARTY のQRコードではありません"; return; }
+  var g = String(text).match(/[?&]g=([A-Za-z0-9_-]+)/);
+  if (g) { app = g[1]; set("kaigai_app", app); }
+  // 同じQRを続けて読まないように、同じ人は5秒あける
+  if (m[1] == lastToken && Date.now() - lastAt < 5000) return;
+  lastToken = m[1]; lastAt = Date.now(); token = m[1];
+  document.getElementById("camMsg").innerHTML = "QRコードをかざしてください";
+  run();
 }
 run();
 </script>
