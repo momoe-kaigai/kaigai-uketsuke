@@ -8,7 +8,7 @@ const STAMP_DEMO = !STAMP_API_URL;
 // 返事の形：{ ok, name, stamps, goal, parties:[{name,date}], gifts, giftDue, next:{name,date,qr}|null }
 // 見つからないとき：{ ng: "…" }
 async function fetchCard(cardId) {
-  const url = STAMP_API_URL + '?api=card&c=' + encodeURIComponent(cardId);
+  const url = STAMP_API_URL + '?api=card&cid=' + encodeURIComponent(cardId);
   // Google のログイン情報を送らない（受付ページと同じ）
   const res = await fetch(url, { credentials: 'omit' });
   return res.json();
