@@ -57,7 +57,10 @@ function show(r){
   var after = "";
   if (mode == "main" && r.after) after = '<div class="after">🎟 アフターパーティーあり<br>アフターのチケットを ' + r.people + '枚 渡してください</div>';
   if (mode == "main" && !r.after) after = '<div class="big"><small>アフターパーティーなし（当日券 3,000円 の案内OK）</small></div>';
-  o.className = "box ok"; o.innerHTML = '<div class="big">✔ 受付OK</div>' + head + after;
+  var stamp = "";
+  if (mode == "main" && r.stamps) stamp = '<div class="big"><small>チャーム ' + r.stamps + '個目' + (r.goal ? '（' + r.goal + '個ごとにシークレットパーティーへ招待）' : '') + '</small></div>';
+  if (r.invited) stamp += '<div class="after">🎉 ' + r.stamps + '個たまりました！<br>シークレットパーティーの招待をLINEで送りました</div>';
+  o.className = "box ok"; o.innerHTML = '<div class="big">✔ 受付OK</div>' + head + after + stamp;
 }
 if (app) set("kaigai_app", app); else app = get("kaigai_app");
 function run(){

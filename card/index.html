@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>スタンプカード | KAIGAI PARTY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@700;800&family=Noto+Serif+JP:wght@400;600&family=Alex+Brush&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stamp.css">
+</head>
+<body>
+<main class="wrap">
+  <p class="demo-banner" id="demoBanner" hidden>これは見本の表示です。</p>
+  <p class="error" id="error" hidden></p>
+
+  <section class="charm-card" id="card" hidden>
+    <div class="charm-head">
+      <div class="brand">Kaigai Party</div>
+      <div class="who" id="who"></div>
+      <div class="count"><b id="cnt">0</b><span>/ <span id="goal">5</span> charms</span></div>
+      <div class="next" id="next"></div>
+    </div>
+    <div class="bracelet" id="bracelet"></div>
+    <ul class="charm-list" id="charmList"></ul>
+    <div class="qr" id="qrArea" hidden>
+      <p class="event" id="nextEvent"></p>
+      <div class="qr-box" id="qr"></div>
+      <p>当日の受付でこのQRを見せてね（LINEに届いたQRと同じです）</p>
+    </div>
+  </section>
+
+  <p class="gift-ready" id="giftReady" hidden>💗 5つそろいました！<br>シークレットパーティーのご招待をLINEでお送りします</p>
+  <p class="note">Kaigai Party に来るたびに、そのパーティーのチャームが1つ増えます。5つそろうと、シークレットパーティーにご招待。このページをホーム画面に追加しておくと便利です。</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="stamp.js"></script>
+<script>
+(async function () {
+  const $ = id => document.getElementById(id);
+  const cardId = new URLSearchParams(location.search).get('c') || '';
+  let state;
+  if (STAMP_DEMO) {
+    $('demoBanner').hidden = false;
+    state = { ok: true, name: 'さくら', stamps: 3, goal: 5, gifts: 0, giftDue: false,
+      parties: [{ name: '2025/2/2 LOVE', date: '2025/02/02' }, { name: '2025/9/6 cowboy', date: '2025/09/06' }, { name: '2026/9/3 パーティー', date: '2026/09/03' }],
+      next: { name: '12/4 KAIGAI PARTY 東京', qr: 'https://momoe-kaigai.github.io/kaigai-uketsuke/?t=sample' } };
+  } else if (!cardId) {
+    state = { ng: 'カードのリンクが正しくありません。LINEで届いたリンクから開いてください。' };
+  } else {
+    try {
+      state = await fetchCard(cardId);
+    } catch (e) {
+      state = { ng: '読み込めませんでした。電波のよいところで開き直してください。' };
+    }
+  }
+
+  if (!state.ok) {
+    $('error').textContent = state.ng || 'カードが見つかりません';
+    $('error').hidden = false;
+    return;
+  }
+
+  const c = currentCard(state);
+  $('who').textContent = state.name + ' さん';
+  $('cnt').textContent = c.filled;
+  $('goal').textContent = c.goal;
+  $('next').textContent = state.giftDue ? 'シークレットパーティーにご招待！' : 'あと' + (c.goal - c.filled) + 'つでシークレットパーティーにご招待';
+  renderBracelet($('bracelet'), state);
+  renderCharmList($('charmList'), state);
+  $('giftReady').hidden = !state.giftDue;
+
+  if (state.next && state.next.qr) {
+    const qr = qrcode(0, 'M');
+    qr.addData(state.next.qr);
+    qr.make();
+    $('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+    $('nextEvent').textContent = state.next.name;
+    $('qrArea').hidden = false;
+  }
+
+  $('card').hidden = false;
+})();
+</script>
+</body>
+</html>

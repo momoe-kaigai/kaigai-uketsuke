@@ -1,0 +1,73 @@
+:root {
+  --cream: #f3ece0;
+  --white: #fffaf3;
+  --ink: #2b211a;
+  --ink-soft: #6e5f52;
+  --wine: #7a2e30;
+  --wine-deep: #3a1518;
+  --gold: #ad8a4d;
+  --gold-soft: #e3d5b8;
+  --pink: #e0457b;
+  --ok: #2f7a4a;
+  --font-head: 'Shippori Mincho B1', serif;
+  --font-body: 'Noto Serif JP', serif;
+  --font-script: 'Alex Brush', cursive;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  padding: 24px max(16px, env(safe-area-inset-right)) 48px max(16px, env(safe-area-inset-left));
+}
+.wrap { max-width: 420px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+/* カード */
+.card { background: var(--wine-deep); color: var(--white); border-radius: 26px; overflow: hidden; box-shadow: 0 20px 45px rgba(43, 33, 26, .2); }
+.card-top { padding: 24px 22px 18px; background: linear-gradient(160deg, var(--wine), var(--wine-deep)); }
+.brand { font-family: var(--font-script); font-size: 38px; line-height: 1; color: var(--gold-soft); }
+.who { font-size: 13px; opacity: .85; margin-top: 6px; }
+.count { display: flex; align-items: baseline; gap: 6px; margin-top: 14px; font-family: var(--font-head); }
+.count b { font-size: 48px; line-height: 1; color: var(--gold-soft); font-variant-numeric: tabular-nums; }
+.bar { height: 8px; background: rgba(255, 250, 243, .18); border-radius: 8px; margin-top: 10px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--gold-soft); border-radius: 8px; transition: width .4s; }
+.next { font-size: 13px; margin-top: 8px; }
+
+.stamps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 18px 16px; background: var(--white); }
+.st { aspect-ratio: 1; border-radius: 50%; border: 1.5px dashed #c9a066; display: grid; place-items: center; color: #a67c42; text-align: center; overflow: hidden; }
+.st span { font-size: 9px; line-height: 1.1; padding: 2px; word-break: break-word; }
+.st.on { border: none; background: var(--wine); color: var(--white); font-weight: 700; }
+.st.gift { border-color: var(--pink); color: var(--pink); }
+.st.on.gift { background: var(--pink); color: #fff; }
+
+.qr { background: var(--white); color: var(--ink); padding: 4px 16px 22px; text-align: center; }
+.qr-box { display: inline-block; background: #fff; padding: 10px; border-radius: 14px; border: 1px solid var(--gold-soft); }
+.qr-box svg { display: block; width: 180px; height: 180px; }
+.qr p { margin: 8px 0 0; font-size: 13px; color: var(--ink-soft); }
+.qr .event { font-family: var(--font-head); font-size: 15px; color: var(--wine); margin: 0 0 8px; }
+
+.gift-ready { background: var(--pink); color: #fff; border-radius: 18px; padding: 16px 18px; font-weight: 700; text-align: center; }
+.note { font-size: 13px; color: var(--ink-soft); margin: 0; }
+.demo-banner { background: var(--gold-soft); border-radius: 12px; padding: 8px 12px; font-size: 13px; }
+.error { background: #fbebeb; color: var(--wine); border-radius: 12px; padding: 12px 14px; }
+
+/* チャームブレスレット */
+.charm-card { background: #fff7f5; border-radius: 26px; box-shadow: 0 20px 45px rgba(43, 33, 26, .14); overflow: hidden; }
+.charm-head { padding: 22px 22px 0; text-align: center; }
+.charm-head .brand { color: var(--wine-deep); }
+.charm-head .who { color: var(--ink-soft); opacity: 1; }
+.charm-head .count { justify-content: center; color: var(--wine-deep); }
+.charm-head .count b { color: var(--wine); }
+.charm-head .next { color: var(--ink-soft); }
+.bracelet svg { display: block; width: 100%; height: auto; }
+.charm-list { list-style: none; margin: 0; padding: 0 22px 18px; display: flex; flex-direction: column; gap: 6px; }
+.charm-list li { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.charm-list .dot { width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 0 2px #e6b8a8; flex: none; }
+.charm-list small { margin-left: auto; color: var(--ink-soft); font-size: 12px; }
+.charm-card .qr { background: transparent; border-top: 1px solid var(--gold-soft); padding-top: 16px; }
+
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
