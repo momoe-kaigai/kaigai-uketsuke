@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex">
 <title>スタンプカード | KAIGAI PARTY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@700;800&family=Noto+Serif+JP:wght@400;600&family=Alex+Brush&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Zen+Old+Mincho:wght@500;700&family=Great+Vibes&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="stamp.css">
 </head>
 <body>
@@ -16,9 +16,10 @@
 
   <section class="charm-card" id="card" hidden>
     <div class="charm-head">
+      <div class="eyebrow">CHARM CARD</div>
       <div class="brand">Kaigai Party</div>
       <div class="who" id="who"></div>
-      <div class="count"><b id="cnt">0</b><span>/ <span id="goal">5</span> charms</span></div>
+      <div class="count"><b id="cnt">0</b><span>/<span id="goal">5</span> charms</span></div>
       <div class="next" id="next"></div>
     </div>
     <div class="bracelet" id="bracelet"></div>
@@ -30,8 +31,8 @@
     </div>
   </section>
 
-  <p class="gift-ready" id="giftReady" hidden>💗 5つそろいました！<br>シークレットパーティーのご招待をLINEでお送りします</p>
-  <p class="note">Kaigai Party に来るたびに、そのパーティーのチャームが1つ増えます。5つそろうと、シークレットパーティーにご招待。このページをホーム画面に追加しておくと便利です。</p>
+  <p class="gift-ready" id="giftReady" hidden>💗 5つそろいました！<br>LINEに、とっておきのお知らせが届きます</p>
+  <p class="note">Kaigai Party に来るたびに、そのパーティーのチャームが1つ増えます。5つそろったら、何かが起こるかも。このページをホーム画面に追加しておくと便利です。</p>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
@@ -66,7 +67,7 @@
   $('who').textContent = state.name + ' さん';
   $('cnt').textContent = c.filled;
   $('goal').textContent = c.goal;
-  $('next').textContent = state.giftDue ? 'シークレットパーティーにご招待！' : 'あと' + (c.goal - c.filled) + 'つでシークレットパーティーにご招待';
+  $('next').textContent = state.giftDue ? '5つそろいました！' : 'あと' + (c.goal - c.filled) + 'つで、とっておきのサプライズ';
   renderBracelet($('bracelet'), state);
   renderCharmList($('charmList'), state);
   $('giftReady').hidden = !state.giftDue;

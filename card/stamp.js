@@ -8,6 +8,7 @@ const STAMP_DEMO = !STAMP_API_URL;
 // 返事の形：{ ok, name, stamps, goal, parties:[{name,date}], gifts, giftDue, next:{name,date,qr}|null }
 // 見つからないとき：{ ng: "…" }
 async function fetchCard(cardId) {
+  // Apps Script は c という名前の値を受け取らない（Googleが使う名前）ので cid で送る
   const url = STAMP_API_URL + '?api=card&cid=' + encodeURIComponent(cardId);
   // Google のログイン情報を送らない（受付ページと同じ）
   const res = await fetch(url, { credentials: 'omit' });
@@ -108,7 +109,7 @@ function renderBracelet(el, state) {
     } else if (isInvite) {
       body = `<line y1="0" y2="8" stroke="#e0457b" stroke-width="1.4" stroke-dasharray="2 2"/>
         <path d="M0 52s-20-12-20-25a11 11 0 0 1 20-6 11 11 0 0 1 20 6C20 40 0 52 0 52z" fill="#fff0f5" stroke="#e0457b" stroke-width="1.5" stroke-dasharray="4 3"/>
-        <text y="34" text-anchor="middle" font-size="8.5" font-weight="700" fill="#e0457b">INVITE</text>`;
+        <text y="36" text-anchor="middle" font-size="15" font-weight="700" fill="#e0457b">?</text>`;
     } else {
       body = `<line y1="0" y2="10" stroke="#c9a59a" stroke-width="1.2" stroke-dasharray="2 2"/>
         <circle cy="30" r="19" fill="#fff" fill-opacity=".6" stroke="#c9a59a" stroke-width="1.3" stroke-dasharray="4 3"/>

@@ -9,9 +9,11 @@
   --gold-soft: #e3d5b8;
   --pink: #e0457b;
   --ok: #2f7a4a;
-  --font-head: 'Shippori Mincho B1', serif;
-  --font-body: 'Noto Serif JP', serif;
-  --font-script: 'Alex Brush', cursive;
+  /* 招待状のような字体：英字の見出しは大文字の Cormorant、ロゴは筆記体 */
+  --font-en: 'Cormorant Garamond', 'Zen Old Mincho', serif;
+  --font-head: 'Zen Old Mincho', serif;
+  --font-body: 'Zen Old Mincho', serif;
+  --font-script: 'Great Vibes', cursive;
 }
 
 * { box-sizing: border-box; }
@@ -48,7 +50,7 @@ body {
 .qr-box { display: inline-block; background: #fff; padding: 10px; border-radius: 14px; border: 1px solid var(--gold-soft); }
 .qr-box svg { display: block; width: 180px; height: 180px; }
 .qr p { margin: 8px 0 0; font-size: 13px; color: var(--ink-soft); }
-.qr .event { font-family: var(--font-head); font-size: 15px; color: var(--wine); margin: 0 0 8px; }
+.qr .event { font-family: var(--font-en); font-weight: 600; letter-spacing: .1em; font-size: 15px; color: var(--wine); margin: 0 0 8px; }
 
 .gift-ready { background: var(--pink); color: #fff; border-radius: 18px; padding: 16px 18px; font-weight: 700; text-align: center; }
 .note { font-size: 13px; color: var(--ink-soft); margin: 0; }
@@ -58,16 +60,19 @@ body {
 /* チャームブレスレット */
 .charm-card { background: #fff7f5; border-radius: 26px; box-shadow: 0 20px 45px rgba(43, 33, 26, .14); overflow: hidden; }
 .charm-head { padding: 22px 22px 0; text-align: center; }
-.charm-head .brand { color: var(--wine-deep); }
+.charm-head .eyebrow { font-family: var(--font-en); font-size: 11px; font-weight: 600; letter-spacing: .38em; color: var(--gold); margin-bottom: 4px; }
+.charm-head .brand { color: var(--wine-deep); font-size: 46px; line-height: 1.15; }
 .charm-head .who { color: var(--ink-soft); opacity: 1; }
 .charm-head .count { justify-content: center; color: var(--wine-deep); }
+.charm-head .count, .charm-head .count b { font-family: var(--font-en); font-weight: 500; }
 .charm-head .count b { color: var(--wine); }
+.charm-head .count span { font-family: var(--font-script); font-size: 23px; }
 .charm-head .next { color: var(--ink-soft); }
 .bracelet svg { display: block; width: 100%; height: auto; }
 .charm-list { list-style: none; margin: 0; padding: 0 22px 18px; display: flex; flex-direction: column; gap: 6px; }
-.charm-list li { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.charm-list li { display: flex; align-items: center; gap: 10px; font-family: var(--font-en); font-size: 16px; letter-spacing: .06em; text-transform: uppercase; }
 .charm-list .dot { width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 0 2px #e6b8a8; flex: none; }
-.charm-list small { margin-left: auto; color: var(--ink-soft); font-size: 12px; }
+.charm-list small { margin-left: auto; color: var(--ink-soft); font-size: 13px; text-transform: none; }
 .charm-card .qr { background: transparent; border-top: 1px solid var(--gold-soft); padding-top: 16px; }
 
 @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
