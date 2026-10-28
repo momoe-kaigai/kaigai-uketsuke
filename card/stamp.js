@@ -87,26 +87,39 @@ function dangleCharm(ch) {
     <ellipse cx="-10" cy="${dy + 16}" rx="6" ry="2.5" fill="#fff" opacity=".45" transform="rotate(-35 -10 ${dy + 16})"/>`;
 }
 
-// ブレスレットを描く。いまのカードの5つの場所に、来た回のチャームをつるす
+// ブレスレットを描く。丸い輪の下半分に、来た回のチャームを5つつるす
 function renderBracelet(el, state) {
   const c = currentCard(state);
-  const W = 320, x0 = 12, x1 = 308;
-  const yOf = x => 26 + 46 * Math.sin(Math.PI * (x - x0) / (x1 - x0));
-  // くさりの輪
+  const W = 320, H = 300, cx = 160, cy = 128, rx = 118, ry = 104;
+  const at = deg => {
+    const a = deg * Math.PI / 180;
+    return { x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a), a: a };
+  };
+  // くさりの輪（ひとまわり）
   let chain = '';
-  for (let x = x0; x <= x1; x += 6) {
-    const y = yOf(x), rot = Math.cos(Math.PI * (x - x0) / (x1 - x0)) * 18;
-    chain += `<ellipse cx="${x}" cy="${y.toFixed(1)}" rx="3.6" ry="2.2" fill="none" stroke="url(#rose)" stroke-width="1.4" transform="rotate(${rot.toFixed(0)} ${x} ${y.toFixed(1)})"/>`;
+  for (let deg = 0; deg < 360; deg += 3.2) {
+    const p = at(deg);
+    // 輪の向きにそって少しかたむける
+    const rot = deg + 90;
+    chain += `<ellipse cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" rx="3.6" ry="2.2" fill="none" stroke="url(#rose)" stroke-width="1.4" transform="rotate(${rot.toFixed(0)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})"/>`;
   }
+  // 留め金（いちばん上）
+  const top = at(270);
+  const clasp = `<g transform="translate(${top.x.toFixed(1)} ${top.y.toFixed(1)})">
+    <rect x="-16" y="-7" width="32" height="14" rx="7" fill="url(#rose)" stroke="#8a5547" stroke-width=".6"/>
+    <text y="4" text-anchor="middle" font-family="'Great Vibes',cursive" font-size="11" fill="#4d1b1e">K</text>
+  </g>`;
+  // 下半分に左から右へ5つ。5つ目がごほうび（中身はお客さんには内緒）
+  const angles = [162, 126, 90, 54, 18].slice(0, c.goal);
   let charms = '';
-  for (let i = 0; i < c.goal; i++) {
-    const x = 40 + i * 60, y = yOf(x) + 3;
-    const p = c.parties[i];
-    const isInvite = i === c.goal - 1;
+  angles.forEach((deg, i) => {
+    const p = at(deg);
+    const item = c.parties[i];
+    const isGift = i === c.goal - 1;
     let body;
-    if (i < c.filled && p) {
-      body = dangleCharm(isInvite && state.giftDue ? { icon: 'heart', color: '#e0457b' } : charmFor(p));
-    } else if (isInvite) {
+    if (i < c.filled && item) {
+      body = dangleCharm(isGift && state.giftDue ? { icon: 'heart', color: '#e0457b' } : charmFor(item));
+    } else if (isGift) {
       body = `<line y1="0" y2="8" stroke="#e0457b" stroke-width="1.4" stroke-dasharray="2 2"/>
         <path d="M0 52s-20-12-20-25a11 11 0 0 1 20-6 11 11 0 0 1 20 6C20 40 0 52 0 52z" fill="#fff0f5" stroke="#e0457b" stroke-width="1.5" stroke-dasharray="4 3"/>
         <text y="36" text-anchor="middle" font-size="15" font-weight="700" fill="#e0457b">?</text>`;
@@ -115,17 +128,16 @@ function renderBracelet(el, state) {
         <circle cy="30" r="19" fill="#fff" fill-opacity=".6" stroke="#c9a59a" stroke-width="1.3" stroke-dasharray="4 3"/>
         <text y="34" text-anchor="middle" font-size="12" fill="#b58f84">${i + 1}</text>`;
     }
-    charms += `<g transform="translate(${x} ${y.toFixed(1)})">${body}</g>`;
-  }
-  el.innerHTML = `<svg viewBox="0 0 ${W} 135" role="img" aria-label="チャームブレスレット ${c.filled} / ${c.goal}">
+    charms += `<g transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})">${body}</g>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="チャームブレスレット ${c.filled} / ${c.goal}">
     <defs>
       <linearGradient id="rose" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0" stop-color="#fde8df"/><stop offset=".5" stop-color="#d99a86"/><stop offset="1" stop-color="#8a5547"/>
       </linearGradient>
     </defs>
     ${chain}
-    <g transform="translate(${x0} ${yOf(x0)})"><circle r="6" fill="url(#rose)"/></g>
-    <g transform="translate(${x1} ${yOf(x1)})"><rect x="-6" y="-4" width="12" height="8" rx="3" fill="url(#rose)"/></g>
+    ${clasp}
     ${charms}
   </svg>`;
 }

@@ -59,15 +59,18 @@ body {
 
 /* チャームブレスレット */
 .charm-card { background: #fff7f5; border-radius: 26px; box-shadow: 0 20px 45px rgba(43, 33, 26, .14); overflow: hidden; }
-.charm-head { padding: 22px 22px 0; text-align: center; }
+.charm-head { padding: 22px 22px 4px; text-align: center; }
 .charm-head .eyebrow { font-family: var(--font-en); font-size: 11px; font-weight: 600; letter-spacing: .38em; color: var(--gold); margin-bottom: 4px; }
 .charm-head .brand { color: var(--wine-deep); font-size: 46px; line-height: 1.15; }
 .charm-head .who { color: var(--ink-soft); opacity: 1; }
-.charm-head .count { justify-content: center; color: var(--wine-deep); }
-.charm-head .count, .charm-head .count b { font-family: var(--font-en); font-weight: 500; }
-.charm-head .count b { color: var(--wine); }
-.charm-head .count span { font-family: var(--font-script); font-size: 23px; }
-.charm-head .next { color: var(--ink-soft); }
+.bracelet-wrap { position: relative; }
+/* 輪の中心（SVG の cy=128 / 高さ300）に合わせる */
+.ring-center { position: absolute; left: 50%; top: 42.7%; transform: translate(-50%, -50%); width: 56%; text-align: center; }
+.ring-center .count { justify-content: center; margin-top: 0; color: var(--wine-deep); }
+.ring-center .count, .ring-center .count b { font-family: var(--font-en); font-weight: 500; }
+.ring-center .count b { color: var(--wine); font-size: 56px; }
+.ring-center .count span { font-family: var(--font-script); font-size: 24px; }
+.ring-center .next { color: var(--ink-soft); font-size: 12px; line-height: 1.6; margin-top: 4px; }
 .bracelet svg { display: block; width: 100%; height: auto; }
 .charm-list { list-style: none; margin: 0; padding: 0 22px 18px; display: flex; flex-direction: column; gap: 6px; }
 .charm-list li { display: flex; align-items: center; gap: 10px; font-family: var(--font-en); font-size: 16px; letter-spacing: .06em; text-transform: uppercase; }
@@ -76,3 +79,4 @@ body {
 .charm-card .qr { background: transparent; border-top: 1px solid var(--gold-soft); padding-top: 16px; }
 
 @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+.ring-center .next { white-space: pre-line; }

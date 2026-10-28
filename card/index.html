@@ -19,10 +19,15 @@
       <div class="eyebrow">CHARM CARD</div>
       <div class="brand">Kaigai Party</div>
       <div class="who" id="who"></div>
-      <div class="count"><b id="cnt">0</b><span>/<span id="goal">5</span> charms</span></div>
-      <div class="next" id="next"></div>
     </div>
-    <div class="bracelet" id="bracelet"></div>
+    <div class="bracelet-wrap">
+      <div class="bracelet" id="bracelet"></div>
+      <!-- 数字はブレスレットの輪のまんなかに重ねる -->
+      <div class="ring-center">
+        <div class="count"><b id="cnt">0</b><span>/<span id="goal">5</span> charms</span></div>
+        <div class="next" id="next"></div>
+      </div>
+    </div>
     <ul class="charm-list" id="charmList"></ul>
     <div class="qr" id="qrArea" hidden>
       <p class="event" id="nextEvent"></p>
@@ -67,7 +72,7 @@
   $('who').textContent = state.name + ' さん';
   $('cnt').textContent = c.filled;
   $('goal').textContent = c.goal;
-  $('next').textContent = state.giftDue ? '5つそろいました！' : 'あと' + (c.goal - c.filled) + 'つで、とっておきのサプライズ';
+  $('next').textContent = state.giftDue ? '5つそろいました！' : 'あと' + (c.goal - c.filled) + 'つで\nとっておきのサプライズ';
   renderBracelet($('bracelet'), state);
   renderCharmList($('charmList'), state);
   $('giftReady').hidden = !state.giftDue;
